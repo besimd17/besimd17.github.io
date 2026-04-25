@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin · Besim Dauti Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Cormorant+Garamond:wght@300;400;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ocean-1: #0a3d62; --ocean-2: #1a6fa0; --ocean-3: #3db2e8; --ocean-4: #a8ddf5; --ocean-5: #ddf1fc;
+    --white: #f8f9fb; --ink: #0d1b2a; --muted: #6a8fa8; --danger: #e05252; --success: #2ecc71;
+    --glass: rgba(255,255,255,0.6); --radius: 14px;
+    --font: 'DM Sans', sans-serif; --font-d: 'Cormorant Garamond', serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); background: #e8f4fb; color: var(--ink); min-height: 100vh; }
+
+  /* BG */
+  body::before {
+    content:''; position:fixed; inset:0; z-index:-1;
+    background: linear-gradient(135deg, #e8f4fb 0%, #c5e8f7 50%, #a0d4ef 100%);
+  }
+
+  /* LOCK SCREEN */
+  #lockScreen {
+    position: fixed; inset: 0; z-index: 9999;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #0a3d62 0%, #1a6fa0 100%);
+  }
+  .lock-card {
+    background: rgba(255,255,255,0.1); backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.2); border-radius: 24px;
+    padding: 52px 44px; width: 100%; max-width: 400px; text-align: center;
+  }
+  .lock-logo { font-family: var(--font-d); font-size: 1.9rem; font-weight: 300; color: #fff; margin-bottom: 4px; }
+  .lock-sub { font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(255,255,255,0.55); margin-bottom: 36px; }
+  .lock-card input {
+    width: 100%; padding: 14px 18px; border-radius: 10px;
+    border: 1.5px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.12);
+    color: #fff; font-size: 1rem; font-family: var(--font); outline: none;
+    transition: border 0.2s; margin-bottom: 14px;
+  }
+  .lock-card input::placeholder { color: rgba(255,255,255,0.45); }
+  .lock-card input:focus { border-color: var(--ocean-3); }
+  .lock-card button {
+    width: 100%; padding: 14px; border-radius: 10px; border: none;
+    background: #fff; color: var(--ocean-1); font-weight: 600; font-size: 0.88rem;
+    letter-spacing: 0.08em; cursor: pointer; transition: opacity 0.2s;
+  }
+  .lock-card button:hover { opacity: 0.88; }
+  .lock-err { color: #ff9090; font-size: 0.82rem; margin-top: 10px; min-height: 20px; }
+
+  /* LAYOUT */
+  .app { display: none; }
+  .app.visible { display: flex; }
+  .sidebar {
+    width: 240px; min-height: 100vh; background: var(--ocean-1);
+    display: flex; flex-direction: column;
+    position: fixed; top: 0; left: 0; bottom: 0;
+    padding: 32px 0;
+    box-shadow: 4px 0 24px rgba(10,61,98,0.15);
+    z-index: 10;
+  }
+  .sidebar-brand { padding: 0 24px 32px; }
+  .sidebar-brand .name { font-family: var(--font-d); font-size: 1.3rem; color: #fff; font-weight: 300; }
+  .sidebar-brand .panel { font-size: 0.65rem; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(255,255,255,0.45); }
+  .nav-item {
+    display: flex; align-items: center; gap: 12px; padding: 13px 24px;
+    font-size: 0.83rem; font-weight: 400; letter-spacing: 0.04em;
+    color: rgba(255,255,255,0.6); cursor: pointer; transition: all 0.2s;
+    border-left: 3px solid transparent;
+  }
+  .nav-item:hover, .nav-item.active {
+    color: #fff; background: rgba(255,255,255,0.08); border-left-color: var(--ocean-3);
+  }
+  .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .sidebar-bottom { margin-top: auto; padding: 0 24px; }
+  .logout-btn {
+    width: 100%; padding: 11px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15);
+    background: transparent; color: rgba(255,255,255,0.55); font-size: 0.8rem;
+    letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 0.2s;
+  }
+  .logout-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
+  .main { margin-left: 240px; padding: 40px; min-height: 100vh; }
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 36px;
+  }
+  .page-title { font-family: var(--font-d); font-size: 2rem; font-weight: 300; color: var(--ocean-1); }
+  .page-title em { font-style: italic; color: var(--ocean-2); }
+
+  /* CARDS */
+  .card {
+    background: var(--glass); backdrop-filter: blur(18px) saturate(1.3);
+    border: 1px solid rgba(255,255,255,0.65); border-radius: var(--radius);
+    padding: 28px; box-shadow: 0 4px 24px rgba(10,61,98,0.08);
+  }
+  .card-title { font-size: 0.8rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; }
+
+  /* STATS ROW */
+  .stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 28px; }
+  .stat-card { background: var(--glass); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.6); border-radius: var(--radius); padding: 20px 24px; text-align: center; }
+  .stat-num { font-family: var(--font-d); font-size: 2.2rem; font-weight: 300; color: var(--ocean-1); }
+  .stat-lbl { font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-top: 2px; }
+
+  /* FORM */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .form-group { display: flex; flex-direction: column; gap: 7px; }
+  .form-group.full { grid-column: 1/-1; }
+  label { font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+  input, select, textarea {
+    padding: 11px 14px; border-radius: 9px; border: 1.5px solid rgba(10,61,98,0.12);
+    background: rgba(255,255,255,0.8); font-family: var(--font); font-size: 0.9rem;
+    color: var(--ink); outline: none; transition: border 0.2s;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--ocean-3); }
+  textarea { resize: vertical; min-height: 80px; }
+
+  /* UPLOAD ZONE */
+  .upload-zone {
+    border: 2px dashed rgba(10,61,98,0.2); border-radius: 12px;
+    padding: 32px; text-align: center; cursor: pointer;
+    transition: all 0.25s; background: rgba(255,255,255,0.4);
+    position: relative;
+  }
+  .upload-zone:hover, .upload-zone.drag { border-color: var(--ocean-3); background: rgba(61,178,232,0.06); }
+  .upload-zone input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; }
+  .upload-zone .icon { font-size: 2rem; margin-bottom: 8px; }
+  .upload-zone p { font-size: 0.85rem; color: var(--muted); }
+  .upload-zone small { font-size: 0.72rem; color: var(--ocean-3); }
+  .preview-strip { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+  .preview-thumb {
+    width: 80px; height: 80px; border-radius: 8px; object-fit: cover;
+    border: 2px solid rgba(255,255,255,0.8); box-shadow: 0 2px 8px rgba(10,61,98,0.1);
+  }
+
+  /* GITHUB SETTINGS */
+  .token-wrap { position: relative; }
+  .token-wrap input { padding-right: 44px; }
+  .token-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--muted); }
+
+  /* SUBMIT */
+  .submit-row { display: flex; gap: 12px; margin-top: 24px; align-items: center; }
+  .btn { padding: 12px 28px; border-radius: 50px; border: none; font-size: 0.82rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.25s; }
+  .btn-primary { background: linear-gradient(135deg, var(--ocean-1), var(--ocean-2)); color: #fff; box-shadow: 0 4px 20px rgba(10,61,98,0.25); }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(10,61,98,0.35); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .btn-outline { background: transparent; border: 1.5px solid rgba(10,61,98,0.2); color: var(--ocean-1); }
+  .btn-danger { background: var(--danger); color: #fff; }
+
+  /* TOAST */
+  #toast {
+    position: fixed; bottom: 28px; right: 28px; z-index: 9000;
+    padding: 14px 22px; border-radius: 10px; font-size: 0.85rem; font-weight: 500;
+    background: var(--ocean-1); color: #fff;
+    box-shadow: 0 8px 30px rgba(10,61,98,0.3);
+    transform: translateY(80px); opacity: 0; transition: all 0.35s;
+    max-width: 320px;
+  }
+  #toast.show { transform: translateY(0); opacity: 1; }
+  #toast.success { background: var(--success); }
+  #toast.error { background: var(--danger); }
+
+  /* MANAGE TABLE */
+  .works-table { width: 100%; border-collapse: collapse; }
+  .works-table th { font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); text-align: left; padding: 10px 14px; border-bottom: 1px solid rgba(10,61,98,0.08); }
+  .works-table td { padding: 12px 14px; border-bottom: 1px solid rgba(10,61,98,0.05); font-size: 0.88rem; vertical-align: middle; }
+  .works-table tr:last-child td { border: none; }
+  .thumb-mini { width: 48px; height: 48px; border-radius: 6px; object-fit: cover; }
+  .thumb-mini-ph { width:48px; height:48px; border-radius:6px; background:var(--ocean-5); display:flex;align-items:center;justify-content:center;font-size:1.2rem; }
+  .badge { padding: 3px 10px; border-radius: 20px; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500; }
+  .badge-paintings { background: #ddf1fc; color: var(--ocean-1); }
+  .badge-woodburning { background: #f5e8d0; color: #7a4a0a; }
+  .badge-photography { background: #d0e8f5; color: #0a3d62; }
+  .badge-drawings { background: #e8d0f5; color: #4a0a7a; }
+  .del-btn { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 1.1rem; transition: color 0.2s; }
+  .del-btn:hover { color: var(--danger); }
+
+  /* PAGES */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* PROGRESS BAR */
+  .progress-bar { height: 4px; border-radius: 2px; background: var(--ocean-5); margin-top: 10px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--ocean-2), var(--ocean-3)); width: 0%; transition: width 0.3s; border-radius: 2px; }
+
+  /* SETTINGS */
+  .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .bio-photo-upload { display: flex; align-items: center; gap: 16px; }
+  .bio-avatar { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; border: 3px solid var(--ocean-4); }
+  .bio-avatar-ph { width: 72px; height: 72px; border-radius: 50%; background: var(--ocean-5); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; border: 3px solid var(--ocean-4); }
+
+  @media (max-width: 900px) {
+    .sidebar { width: 60px; }
+    .sidebar .sidebar-brand, .nav-item span, .sidebar-bottom { display: none; }
+    .nav-item { justify-content: center; padding: 16px; }
+    .main { margin-left: 60px; padding: 24px; }
+    .stats-row { grid-template-columns: repeat(2,1fr); }
+    .form-grid { grid-template-columns: 1fr; }
+    .settings-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── LOCK ────────────────────────────────────────────── -->
+<div id="lockScreen">
+  <div class="lock-card">
+    <div class="lock-logo">Besim Dauti</div>
+    <div class="lock-sub">Studio Admin Panel</div>
+    <input type="password" id="pwInput" placeholder="Enter password" autocomplete="current-password" />
+    <button onclick="tryLogin()">Enter Studio</button>
+    <div class="lock-err" id="lockErr"></div>
+  </div>
+</div>
+
+<!-- ─── APP ─────────────────────────────────────────────── -->
+<div class="app" id="app">
+  <div class="sidebar">
+    <div class="sidebar-brand">
+      <div class="name">Besim Dauti</div>
+      <div class="panel">Admin Panel</div>
+    </div>
+    <div class="nav-item active" data-page="dashboard" onclick="showPage('dashboard',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span>Dashboard</span>
+    </div>
+    <div class="nav-item" data-page="upload" onclick="showPage('upload',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      <span>Upload Work</span>
+    </div>
+    <div class="nav-item" data-page="manage" onclick="showPage('manage',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>
+      <span>Manage Works</span>
+    </div>
+    <div class="nav-item" data-page="settings" onclick="showPage('settings',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span>Settings</span>
+    </div>
+    <div class="sidebar-bottom">
+      <button class="logout-btn" onclick="logout()">Log Out</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="topbar">
+        <h1 class="page-title">Good to see you, <em>Besim</em></h1>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-num" id="st-total">0</div><div class="stat-lbl">Total Works</div></div>
+        <div class="stat-card"><div class="stat-num" id="st-paintings">0</div><div class="stat-lbl">Paintings</div></div>
+        <div class="stat-card"><div class="stat-num" id="st-woodburning">0</div><div class="stat-lbl">Woodburning</div></div>
+        <div class="stat-card"><div class="stat-num" id="st-photos">0</div><div class="stat-lbl">Photography</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Recent Uploads</div>
+        <table class="works-table" id="recentTable">
+          <thead><tr><th>Image</th><th>Title</th><th>Category</th><th>Year</th></tr></thead>
+          <tbody id="recentBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- UPLOAD -->
+    <div class="page" id="page-upload">
+      <div class="topbar"><h1 class="page-title">Upload <em>New Work</em></h1></div>
+      <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:24px">
+        <div class="card">
+          <div class="card-title">Work Details</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Title *</label>
+              <input type="text" id="fTitle" placeholder="e.g. Morning Silence" />
+            </div>
+            <div class="form-group">
+              <label>Category *</label>
+              <select id="fCat">
+                <option value="">— Select —</option>
+                <option value="paintings">Paintings</option>
+                <option value="woodburning">Woodburning</option>
+                <option value="photography">Photography</option>
+                <option value="drawings">Drawings</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Year</label>
+              <input type="number" id="fYear" placeholder="2024" min="1990" max="2099" />
+            </div>
+            <div class="form-group">
+              <label>Medium</label>
+              <input type="text" id="fMedium" placeholder="e.g. Oil on canvas" />
+            </div>
+            <div class="form-group full">
+              <label>Description (optional)</label>
+              <textarea id="fDesc" placeholder="Tell the story behind this piece..."></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Image</div>
+          <div class="upload-zone" id="uploadZone">
+            <input type="file" id="fFile" accept="image/*" multiple onchange="handleFiles(this.files)" />
+            <div class="icon">🖼️</div>
+            <p>Drop image here or click to browse</p>
+            <small>JPG · PNG · WEBP</small>
+          </div>
+          <div class="preview-strip" id="previewStrip"></div>
+          <div class="progress-bar" id="progressBar" style="display:none"><div class="progress-fill" id="progressFill"></div></div>
+        </div>
+      </div>
+      <div class="submit-row">
+        <button class="btn btn-primary" id="publishBtn" onclick="publishWork()">Publish to Gallery</button>
+        <button class="btn btn-outline" onclick="clearForm()">Clear</button>
+        <span id="publishStatus" style="font-size:0.82rem;color:var(--muted)"></span>
+      </div>
+    </div>
+
+    <!-- MANAGE -->
+    <div class="page" id="page-manage">
+      <div class="topbar">
+        <h1 class="page-title">Manage <em>Works</em></h1>
+        <button class="btn btn-outline" onclick="loadWorks()">↻ Refresh</button>
+      </div>
+      <div class="card">
+        <table class="works-table">
+          <thead><tr><th>Image</th><th>Title</th><th>Category</th><th>Year</th><th>Medium</th><th>Delete</th></tr></thead>
+          <tbody id="manageBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="page" id="page-settings">
+      <div class="topbar"><h1 class="page-title">Studio <em>Settings</em></h1></div>
+      <div style="display:grid;gap:24px">
+        <div class="card">
+          <div class="card-title">GitHub Connection</div>
+          <div class="settings-grid">
+            <div class="form-group">
+              <label>GitHub Username</label>
+              <input type="text" id="sUser" placeholder="e.g. st117te" />
+            </div>
+            <div class="form-group">
+              <label>Repository Name</label>
+              <input type="text" id="sRepo" placeholder="e.g. st117te.github.io" />
+            </div>
+            <div class="form-group full">
+              <label>Personal Access Token (PAT)</label>
+              <div class="token-wrap">
+                <input type="password" id="sTok" placeholder="ghp_••••••••••••••••" />
+                <button class="token-toggle" onclick="toggleTok()">👁</button>
+              </div>
+              <small style="color:var(--muted);font-size:0.72rem;margin-top:4px">Stored locally in your browser only. Never sent anywhere except GitHub's API.</small>
+            </div>
+            <div class="form-group">
+              <label>Branch</label>
+              <input type="text" id="sBranch" placeholder="main" />
+            </div>
+          </div>
+          <div style="margin-top:16px;display:flex;gap:12px">
+            <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+            <button class="btn btn-outline" onclick="testConnection()">Test Connection</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Admin Password</div>
+          <div class="settings-grid">
+            <div class="form-group">
+              <label>New Password</label>
+              <input type="password" id="newPw" placeholder="Enter new password" />
+            </div>
+            <div class="form-group">
+              <label>Confirm</label>
+              <input type="password" id="confPw" placeholder="Repeat new password" />
+            </div>
+          </div>
+          <button class="btn btn-primary" style="margin-top:16px" onclick="changePw()">Update Password</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ─── AUTH ───────────────────────────────────────────────────── */
+const DEFAULT_PW = 'studio2024';
+function getPw() { return localStorage.getItem('adminPw') || DEFAULT_PW; }
+function tryLogin() {
+  const v = document.getElementById('pwInput').value;
+  if (v === getPw()) {
+    localStorage.setItem('adminSess','1');
+    document.getElementById('lockScreen').style.display = 'none';
+    document.getElementById('app').classList.add('visible');
+    init();
+  } else {
+    document.getElementById('lockErr').textContent = 'Incorrect password.';
+    setTimeout(()=>document.getElementById('lockErr').textContent='', 2000);
+  }
+}
+function logout() { localStorage.removeItem('adminSess'); location.reload(); }
+document.getElementById('pwInput').addEventListener('keydown', e => { if(e.key==='Enter') tryLogin(); });
+if (localStorage.getItem('adminSess') === '1') {
+  document.getElementById('lockScreen').style.display='none';
+  document.getElementById('app').classList.add('visible');
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  document.addEventListener('DOMContentLoaded', ()=>{});
+}
+
+/* ─── SETTINGS ───────────────────────────────────────────────── */
+function getSt() { return JSON.parse(localStorage.getItem('ghSettings')||'{}'); }
+function saveSt(o) { localStorage.setItem('ghSettings', JSON.stringify(o)); }
+function saveSettings() {
+  saveSt({ user: val('sUser'), repo: val('sRepo'), tok: val('sTok'), branch: val('sBranch')||'main' });
+  toast('Settings saved!', 'success');
+}
+function loadSettings() {
+  const s = getSt();
+  setVal('sUser', s.user||''); setVal('sRepo', s.repo||''); setVal('sTok', s.tok||''); setVal('sBranch', s.branch||'main');
+}
+function toggleTok() {
+  const i = document.getElementById('sTok');
+  i.type = i.type==='password' ? 'text' : 'password';
+}
+async function testConnection() {
+  const s = getSt();
+  if (!s.tok || !s.user || !s.repo) { toast('Fill in GitHub settings first.','error'); return; }
+  try {
+    const r = await ghGet(`repos/${s.user}/${s.repo}`);
+    toast(`✓ Connected to ${r.full_name}`, 'success');
+  } catch(e) { toast('Connection failed: '+e.message,'error'); }
+}
+function changePw() {
+  const a = val('newPw'), b = val('confPw');
+  if (!a) return toast('Enter a password','error');
+  if (a !== b) return toast("Passwords don't match",'error');
+  localStorage.setItem('adminPw', a);
+  toast('Password updated!','success');
+  setVal('newPw',''); setVal('confPw','');
+}
+
+/* ─── GITHUB API ─────────────────────────────────────────────── */
+function tok() { return getSt().tok||''; }
+function ghUser() { return getSt().user||''; }
+function ghRepo() { return getSt().repo||''; }
+function ghBranch() { return getSt().branch||'main'; }
+const GH = 'https://api.github.com';
+async function ghGet(path) {
+  const r = await fetch(`${GH}/${path}`, { headers: { Authorization:`token ${tok()}`, Accept:'application/vnd.github.v3+json' } });
+  if (!r.ok) throw new Error(r.status);
+  return r.json();
+}
+async function ghPut(path, body) {
+  const r = await fetch(`${GH}/${path}`, { method:'PUT', headers: { Authorization:`token ${tok()}`, Accept:'application/vnd.github.v3+json', 'Content-Type':'application/json' }, body: JSON.stringify(body) });
+  if (!r.ok) { const e = await r.json(); throw new Error(e.message||r.status); }
+  return r.json();
+}
+async function ghDel(path, body) {
+  const r = await fetch(`${GH}/${path}`, { method:'DELETE', headers: { Authorization:`token ${tok()}`, Accept:'application/vnd.github.v3+json', 'Content-Type':'application/json' }, body: JSON.stringify(body) });
+  if (!r.ok) { const e = await r.json(); throw new Error(e.message||r.status); }
+  return r.json();
+}
+
+/* ─── WORKS DATA ─────────────────────────────────────────────── */
+// Load / save works.json via GitHub API
+async function fetchWorksJson() {
+  try {
+    const data = await ghGet(`repos/${ghUser()}/${ghRepo()}/contents/works.json`);
+    return { works: JSON.parse(atob(data.content)), sha: data.sha };
+  } catch { return { works: [], sha: null }; }
+}
+async function saveWorksJson(works, sha) {
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(works, null, 2))));
+  const body = { message: `Update works.json [${new Date().toISOString()}]`, content, branch: ghBranch() };
+  if (sha) body.sha = sha;
+  await ghPut(`repos/${ghUser()}/${ghRepo()}/contents/works.json`, body);
+}
+async function uploadImage(file, filename) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = async () => {
+      const b64 = r.result.split(',')[1];
+      try {
+        // check if file exists (get sha)
+        let sha = null;
+        try { const ex = await ghGet(`repos/${ghUser()}/${ghRepo()}/contents/images/${filename}`); sha = ex.sha; } catch {}
+        const body = { message:`Upload ${filename}`, content: b64, branch: ghBranch() };
+        if (sha) body.sha = sha;
+        const resp = await ghPut(`repos/${ghUser()}/${ghRepo()}/contents/images/${filename}`, body);
+        res(`https://${ghUser()}.github.io/${ghRepo()}/images/${filename}`);
+      } catch(e) { rej(e); }
+    };
+    r.onerror = () => rej(new Error('Read failed'));
+    r.readAsDataURL(file);
+  });
+}
+
+/* ─── UPLOAD FORM ─────────────────────────────────────────────── */
+let pickedFiles = [];
+function handleFiles(files) {
+  pickedFiles = Array.from(files);
+  const strip = document.getElementById('previewStrip');
+  strip.innerHTML = '';
+  pickedFiles.forEach(f => {
+    const url = URL.createObjectURL(f);
+    const img = document.createElement('img');
+    img.className = 'preview-thumb'; img.src = url;
+    strip.appendChild(img);
+  });
+}
+const zone = document.getElementById('uploadZone');
+if (zone) {
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
+  zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag'); handleFiles(e.dataTransfer.files); });
+}
+
+async function publishWork() {
+  const title = val('fTitle'), cat = val('fCat'), year = val('fYear'), medium = val('fMedium'), desc = val('fDesc');
+  if (!title || !cat) return toast('Title and category are required.','error');
+  if (!tok() || !ghUser() || !ghRepo()) return toast('Set up GitHub settings first.','error');
+
+  const btn = document.getElementById('publishBtn');
+  btn.disabled = true; btn.textContent = 'Publishing…';
+
+  try {
+    const { works, sha } = await fetchWorksJson();
+    const pb = document.getElementById('progressBar');
+    const pf = document.getElementById('progressFill');
+    pb.style.display = 'block'; pf.style.width = '10%';
+
+    let srcUrl = '';
+    if (pickedFiles.length) {
+      const f = pickedFiles[0];
+      const ext = f.name.split('.').pop();
+      const fname = `${title.toLowerCase().replace(/\s+/g,'-')}-${Date.now()}.${ext}`;
+      pf.style.width = '35%';
+      srcUrl = await uploadImage(f, fname);
+      pf.style.width = '65%';
+    }
+
+    const newWork = {
+      id: Date.now(),
+      title, cat, year: year ? +year : new Date().getFullYear(),
+      medium: medium||'', description: desc||'',
+      src: srcUrl, uploadedAt: new Date().toISOString()
+    };
+    works.unshift(newWork);
+    pf.style.width = '80%';
+    await saveWorksJson(works, sha);
+    pf.style.width = '100%';
+
+    toast(`"${title}" published!`, 'success');
+    clearForm();
+    setTimeout(()=>{ pb.style.display='none'; pf.style.width='0%'; },800);
+    loadWorks();
+    updateStats(works);
+  } catch(e) {
+    toast('Error: '+e.message,'error');
+  }
+  btn.disabled = false; btn.textContent = 'Publish to Gallery';
+}
+
+function clearForm() {
+  ['fTitle','fCat','fYear','fMedium','fDesc'].forEach(id=>setVal(id,''));
+  pickedFiles = []; document.getElementById('previewStrip').innerHTML = '';
+}
+
+/* ─── MANAGE ─────────────────────────────────────────────────── */
+async function loadWorks() {
+  const tbody = document.getElementById('manageBody');
+  tbody.innerHTML = '<tr><td colspan="6" style="color:var(--muted);padding:20px">Loading…</td></tr>';
+  try {
+    const { works } = await fetchWorksJson();
+    updateStats(works);
+    renderManage(works);
+    renderRecent(works);
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="6" style="color:var(--danger);padding:20px">${e.message}</td></tr>`;
+  }
+}
+function renderManage(works) {
+  const tbody = document.getElementById('manageBody');
+  if (!works.length) { tbody.innerHTML='<tr><td colspan="6" style="color:var(--muted);padding:20px;text-align:center">No works yet. Upload your first piece!</td></tr>'; return; }
+  tbody.innerHTML = works.map(w => `
+    <tr>
+      <td>${w.src ? `<img class="thumb-mini" src="${w.src}" alt="${w.title}"/>` : `<div class="thumb-mini-ph">🖼️</div>`}</td>
+      <td><strong>${w.title}</strong></td>
+      <td><span class="badge badge-${w.cat}">${w.cat}</span></td>
+      <td>${w.year||'—'}</td>
+      <td>${w.medium||'—'}</td>
+      <td><button class="del-btn" onclick="deleteWork(${w.id})" title="Delete">🗑</button></td>
+    </tr>
+  `).join('');
+}
+function renderRecent(works) {
+  const tbody = document.getElementById('recentBody');
+  const recent = works.slice(0,6);
+  tbody.innerHTML = recent.length ? recent.map(w => `
+    <tr>
+      <td>${w.src ? `<img class="thumb-mini" src="${w.src}" alt="${w.title}"/>` : `<div class="thumb-mini-ph">🖼️</div>`}</td>
+      <td>${w.title}</td>
+      <td><span class="badge badge-${w.cat}">${w.cat}</span></td>
+      <td>${w.year||'—'}</td>
+    </tr>
+  `).join('') : '<tr><td colspan="4" style="color:var(--muted);padding:20px">No works yet.</td></tr>';
+}
+function updateStats(works) {
+  setEl('st-total', works.length);
+  setEl('st-paintings', works.filter(w=>w.cat==='paintings').length);
+  setEl('st-woodburning', works.filter(w=>w.cat==='woodburning').length);
+  setEl('st-photos', works.filter(w=>w.cat==='photography').length);
+}
+async function deleteWork(id) {
+  if (!confirm('Delete this work? This cannot be undone.')) return;
+  try {
+    const { works, sha } = await fetchWorksJson();
+    const updated = works.filter(w => w.id !== id);
+    await saveWorksJson(updated, sha);
+    toast('Work deleted.','success');
+    loadWorks();
+  } catch(e) { toast('Error: '+e.message,'error'); }
+}
+
+/* ─── NAV ────────────────────────────────────────────────────── */
+function showPage(id, el) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  el.classList.add('active');
+  if (id==='manage') loadWorks();
+  if (id==='settings') loadSettings();
+}
+
+/* ─── TOAST ──────────────────────────────────────────────────── */
+let toastTimer;
+function toast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = `show ${type}`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.className='', 3500);
+}
+
+/* ─── HELPERS ────────────────────────────────────────────────── */
+const val = id => document.getElementById(id)?.value?.trim()||'';
+const setVal = (id,v) => { if(document.getElementById(id)) document.getElementById(id).value = v; };
+const setEl = (id,v) => { if(document.getElementById(id)) document.getElementById(id).textContent = v; };
+
+/* ─── INIT ───────────────────────────────────────────────────── */
+function init() {
+  loadSettings();
+  if (!getSt().tok) {
+    // nudge toward settings
+    setTimeout(()=>toast('👋 Welcome! Set up GitHub settings first.'), 600);
+  } else {
+    loadWorks();
+  }
+}
+</script>
+</body>
+</html>
