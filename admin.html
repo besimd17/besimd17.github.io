@@ -1,664 +1,697 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Admin · Besim Dauti Studio</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Cormorant+Garamond:wght@300;400;600&display=swap" rel="stylesheet" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Admin · Besim Dauti</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;1,400&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet"/>
 <style>
-  :root {
-    --ocean-1: #0a3d62; --ocean-2: #1a6fa0; --ocean-3: #3db2e8; --ocean-4: #a8ddf5; --ocean-5: #ddf1fc;
-    --white: #f8f9fb; --ink: #0d1b2a; --muted: #6a8fa8; --danger: #e05252; --success: #2ecc71;
-    --glass: rgba(255,255,255,0.6); --radius: 14px;
-    --font: 'DM Sans', sans-serif; --font-d: 'Cormorant Garamond', serif;
-  }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: var(--font); background: #e8f4fb; color: var(--ink); min-height: 100vh; }
+:root{
+  --bg:#080d14;--bg1:#0b1220;--bg2:#0f1828;--bg3:#131e30;--side:#060b10;
+  --a1:#3a6e8c;--a2:#5b96b8;--a3:#7eb8d4;--a4:#aed4e8;--a5:#d6edf7;
+  --ag:linear-gradient(135deg,#3a6e8c 0%,#5b96b8 50%,#aed4e8 100%);
+  --hi:#dce8f0;--mid:#5a7a90;--lo:#2a3d50;
+  --bdr:rgba(94,168,210,.10);--bdrh:rgba(94,168,210,.28);
+  --danger:#c0392b;
+  --sb:224px;
+  --ease:cubic-bezier(.25,.8,.25,1);
+  --serif:'Libre Baskerville',Georgia,serif;
+  --sans:'Space Grotesk',system-ui,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--sans);background:var(--bg);color:var(--hi);
+  -webkit-font-smoothing:antialiased;overflow-x:hidden}
+input,select,textarea,button{font-family:var(--sans)}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;border:none;background:none}
 
-  /* BG */
-  body::before {
-    content:''; position:fixed; inset:0; z-index:-1;
-    background: linear-gradient(135deg, #e8f4fb 0%, #c5e8f7 50%, #a0d4ef 100%);
-  }
+/* ── LOCK ───────────────────────────────────────────────────── */
+#ls{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:var(--bg)}
+.lc{width:100%;max-width:396px;background:var(--bg2);border:1px solid var(--bdr);
+  padding:56px 44px;text-align:center;position:relative;overflow:hidden}
+.lc::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(126,184,212,.45),transparent)}
+.lc-logo{font-family:var(--serif);font-size:1.9rem;font-weight:400;letter-spacing:.12em;
+  background:var(--ag);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+.lc-sub{font-size:.52rem;font-weight:300;letter-spacing:.38em;text-transform:uppercase;
+  color:var(--lo);margin:8px 0 40px}
+.lc-in{width:100%;padding:12px 16px;background:rgba(94,150,184,.04);border:1px solid var(--bdr);
+  color:var(--hi);font-size:.9rem;outline:none;transition:border .2s;margin-bottom:14px;letter-spacing:.04em}
+.lc-in:focus{border-color:var(--a2)}
+.lc-in::placeholder{color:var(--lo)}
+.lc-btn{width:100%;padding:13px;background:var(--ag);color:var(--bg);
+  font-size:.64rem;font-weight:500;letter-spacing:.28em;text-transform:uppercase;
+  border:none;cursor:pointer;transition:opacity .2s,transform .2s}
+.lc-btn:hover{opacity:.88;transform:translateY(-1px)}
+.lc-err{color:#e06060;font-size:.72rem;margin-top:12px;min-height:18px}
 
-  /* LOCK SCREEN */
-  #lockScreen {
-    position: fixed; inset: 0; z-index: 9999;
-    display: flex; align-items: center; justify-content: center;
-    background: linear-gradient(135deg, #0a3d62 0%, #1a6fa0 100%);
-  }
-  .lock-card {
-    background: rgba(255,255,255,0.1); backdrop-filter: blur(20px);
-    border: 1px solid rgba(255,255,255,0.2); border-radius: 24px;
-    padding: 52px 44px; width: 100%; max-width: 400px; text-align: center;
-  }
-  .lock-logo { font-family: var(--font-d); font-size: 1.9rem; font-weight: 300; color: #fff; margin-bottom: 4px; }
-  .lock-sub { font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(255,255,255,0.55); margin-bottom: 36px; }
-  .lock-card input {
-    width: 100%; padding: 14px 18px; border-radius: 10px;
-    border: 1.5px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.12);
-    color: #fff; font-size: 1rem; font-family: var(--font); outline: none;
-    transition: border 0.2s; margin-bottom: 14px;
-  }
-  .lock-card input::placeholder { color: rgba(255,255,255,0.45); }
-  .lock-card input:focus { border-color: var(--ocean-3); }
-  .lock-card button {
-    width: 100%; padding: 14px; border-radius: 10px; border: none;
-    background: #fff; color: var(--ocean-1); font-weight: 600; font-size: 0.88rem;
-    letter-spacing: 0.08em; cursor: pointer; transition: opacity 0.2s;
-  }
-  .lock-card button:hover { opacity: 0.88; }
-  .lock-err { color: #ff9090; font-size: 0.82rem; margin-top: 10px; min-height: 20px; }
+/* ── APP ────────────────────────────────────────────────────── */
+#app{display:none;min-height:100vh}
+#app.on{display:flex}
 
-  /* LAYOUT */
-  .app { display: none; }
-  .app.visible { display: flex; }
-  .sidebar {
-    width: 240px; min-height: 100vh; background: var(--ocean-1);
-    display: flex; flex-direction: column;
-    position: fixed; top: 0; left: 0; bottom: 0;
-    padding: 32px 0;
-    box-shadow: 4px 0 24px rgba(10,61,98,0.15);
-    z-index: 10;
-  }
-  .sidebar-brand { padding: 0 24px 32px; }
-  .sidebar-brand .name { font-family: var(--font-d); font-size: 1.3rem; color: #fff; font-weight: 300; }
-  .sidebar-brand .panel { font-size: 0.65rem; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(255,255,255,0.45); }
-  .nav-item {
-    display: flex; align-items: center; gap: 12px; padding: 13px 24px;
-    font-size: 0.83rem; font-weight: 400; letter-spacing: 0.04em;
-    color: rgba(255,255,255,0.6); cursor: pointer; transition: all 0.2s;
-    border-left: 3px solid transparent;
-  }
-  .nav-item:hover, .nav-item.active {
-    color: #fff; background: rgba(255,255,255,0.08); border-left-color: var(--ocean-3);
-  }
-  .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
-  .sidebar-bottom { margin-top: auto; padding: 0 24px; }
-  .logout-btn {
-    width: 100%; padding: 11px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15);
-    background: transparent; color: rgba(255,255,255,0.55); font-size: 0.8rem;
-    letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: all 0.2s;
-  }
-  .logout-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
-  .main { margin-left: 240px; padding: 40px; min-height: 100vh; }
-  .topbar {
-    display: flex; align-items: center; justify-content: space-between; margin-bottom: 36px;
-  }
-  .page-title { font-family: var(--font-d); font-size: 2rem; font-weight: 300; color: var(--ocean-1); }
-  .page-title em { font-style: italic; color: var(--ocean-2); }
+/* SIDEBAR */
+.sb{width:var(--sb);min-height:100vh;background:var(--side);
+  border-right:1px solid var(--bdr);
+  display:flex;flex-direction:column;
+  position:fixed;top:0;left:0;bottom:0;z-index:200;overflow-y:auto}
+.sb-head{padding:28px 24px 22px;border-bottom:1px solid var(--bdr);position:relative}
+.sb-head::after{content:'';position:absolute;bottom:0;left:24px;right:24px;height:1px;
+  background:linear-gradient(90deg,var(--a1),transparent)}
+.sb-logo{font-family:var(--serif);font-size:1.15rem;font-weight:400;letter-spacing:.12em;
+  background:var(--ag);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+.sb-sub{font-size:.5rem;font-weight:300;letter-spacing:.38em;text-transform:uppercase;color:var(--lo);margin-top:5px}
+.sb-nav{padding:16px 0;flex:1}
+.sb-grp{font-size:.46rem;font-weight:300;letter-spacing:.38em;text-transform:uppercase;
+  color:var(--lo);padding:16px 24px 8px}
+.sb-item{display:flex;align-items:center;gap:11px;padding:11px 24px;
+  font-size:.68rem;font-weight:300;letter-spacing:.06em;color:var(--mid);cursor:pointer;
+  border-left:2px solid transparent;transition:all .2s}
+.sb-item svg{width:15px;height:15px;flex-shrink:0;opacity:.55;transition:opacity .2s}
+.sb-item:hover{color:var(--a4);background:rgba(94,150,184,.05)}
+.sb-item.on{color:var(--a3);background:rgba(94,150,184,.08);border-left-color:var(--a2)}
+.sb-item.on svg{opacity:1}
+.sb-foot{padding:18px 24px;border-top:1px solid var(--bdr);display:flex;flex-direction:column;gap:8px}
+.sb-fbt{display:flex;align-items:center;gap:8px;padding:9px 14px;
+  font-size:.6rem;font-weight:300;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--lo);border:1px solid var(--bdr);transition:all .2s;width:100%}
+.sb-fbt:hover{border-color:var(--bdrh);color:var(--a4)}
+.sb-fbt.danger{border-color:rgba(192,57,43,.16)}
+.sb-fbt.danger:hover{border-color:rgba(192,57,43,.42);color:#e06060}
 
-  /* CARDS */
-  .card {
-    background: var(--glass); backdrop-filter: blur(18px) saturate(1.3);
-    border: 1px solid rgba(255,255,255,0.65); border-radius: var(--radius);
-    padding: 28px; box-shadow: 0 4px 24px rgba(10,61,98,0.08);
-  }
-  .card-title { font-size: 0.8rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; }
+/* MAIN */
+.main{margin-left:var(--sb);flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{padding:28px 36px 0;display:flex;align-items:flex-start;justify-content:space-between;
+  margin-bottom:28px;flex-wrap:wrap;gap:14px}
+.ptitle{font-family:var(--serif);font-size:1.75rem;font-weight:400;color:var(--hi);
+  letter-spacing:.06em;line-height:1}
+.ptitle em{font-style:italic;background:var(--ag);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.bw{padding:0 36px 56px;flex:1}
 
-  /* STATS ROW */
-  .stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 28px; }
-  .stat-card { background: var(--glass); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.6); border-radius: var(--radius); padding: 20px 24px; text-align: center; }
-  .stat-num { font-family: var(--font-d); font-size: 2.2rem; font-weight: 300; color: var(--ocean-1); }
-  .stat-lbl { font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-top: 2px; }
+/* PAGES */
+.pg{display:none}
+.pg.on{display:block}
 
-  /* FORM */
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-  .form-group { display: flex; flex-direction: column; gap: 7px; }
-  .form-group.full { grid-column: 1/-1; }
-  label { font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
-  input, select, textarea {
-    padding: 11px 14px; border-radius: 9px; border: 1.5px solid rgba(10,61,98,0.12);
-    background: rgba(255,255,255,0.8); font-family: var(--font); font-size: 0.9rem;
-    color: var(--ink); outline: none; transition: border 0.2s;
-  }
-  input:focus, select:focus, textarea:focus { border-color: var(--ocean-3); }
-  textarea { resize: vertical; min-height: 80px; }
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--bdr);padding:26px;margin-bottom:16px;
+  position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,var(--a1),transparent);opacity:.45}
+.clabel{font-size:.52rem;font-weight:300;letter-spacing:.36em;text-transform:uppercase;
+  color:var(--a3);margin-bottom:16px;display:block}
 
-  /* UPLOAD ZONE */
-  .upload-zone {
-    border: 2px dashed rgba(10,61,98,0.2); border-radius: 12px;
-    padding: 32px; text-align: center; cursor: pointer;
-    transition: all 0.25s; background: rgba(255,255,255,0.4);
-    position: relative;
-  }
-  .upload-zone:hover, .upload-zone.drag { border-color: var(--ocean-3); background: rgba(61,178,232,0.06); }
-  .upload-zone input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; }
-  .upload-zone .icon { font-size: 2rem; margin-bottom: 8px; }
-  .upload-zone p { font-size: 0.85rem; color: var(--muted); }
-  .upload-zone small { font-size: 0.72rem; color: var(--ocean-3); }
-  .preview-strip { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
-  .preview-thumb {
-    width: 80px; height: 80px; border-radius: 8px; object-fit: cover;
-    border: 2px solid rgba(255,255,255,0.8); box-shadow: 0 2px 8px rgba(10,61,98,0.1);
-  }
+/* STATS */
+.srow{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.sbox{background:var(--bg2);border:1px solid var(--bdr);padding:20px 14px;text-align:center;
+  position:relative;overflow:hidden;transition:border-color .2s}
+.sbox::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--a1),transparent);opacity:.4}
+.sbox:hover{border-color:var(--bdrh)}
+.snum{font-family:var(--serif);font-size:2.1rem;font-weight:400;
+  background:var(--ag);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+.slbl{font-size:.52rem;font-weight:300;letter-spacing:.2em;text-transform:uppercase;color:var(--lo);margin-top:6px;display:block}
 
-  /* GITHUB SETTINGS */
-  .token-wrap { position: relative; }
-  .token-wrap input { padding-right: 44px; }
-  .token-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--muted); }
+/* FORM */
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fc{display:flex;flex-direction:column;gap:6px}
+.fc.full{grid-column:1/-1}
+.fl{font-size:.54rem;font-weight:300;letter-spacing:.26em;text-transform:uppercase;color:var(--mid)}
+.fi,.fs,.ft{padding:11px 14px;background:rgba(94,150,184,.03);border:1px solid var(--bdr);
+  color:var(--hi);font-size:.86rem;outline:none;transition:border .2s;width:100%}
+.fi:focus,.fs:focus,.ft:focus{border-color:var(--a2)}
+.fi::placeholder,.ft::placeholder{color:var(--lo)}
+.fs{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%232a3d50' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:30px}
+.fs option{background:var(--bg3);color:var(--hi)}
+.ft{resize:vertical;min-height:90px;line-height:1.65}
+.fn{font-size:.6rem;color:var(--lo);margin-top:4px;letter-spacing:.04em;line-height:1.5}
 
-  /* SUBMIT */
-  .submit-row { display: flex; gap: 12px; margin-top: 24px; align-items: center; }
-  .btn { padding: 12px 28px; border-radius: 50px; border: none; font-size: 0.82rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.25s; }
-  .btn-primary { background: linear-gradient(135deg, var(--ocean-1), var(--ocean-2)); color: #fff; box-shadow: 0 4px 20px rgba(10,61,98,0.25); }
-  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(10,61,98,0.35); }
-  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-  .btn-outline { background: transparent; border: 1.5px solid rgba(10,61,98,0.2); color: var(--ocean-1); }
-  .btn-danger { background: var(--danger); color: #fff; }
+/* UPLOAD ZONE */
+.uz{position:relative;border:1px dashed rgba(94,150,184,.2);padding:36px 24px;
+  text-align:center;cursor:pointer;background:rgba(94,150,184,.02);transition:all .22s}
+.uz:hover,.uz.drag{border-color:var(--a2);background:rgba(94,150,184,.05)}
+.uz input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.uz-icon{font-size:1.8rem;margin-bottom:8px;display:block}
+.uz-txt{font-size:.78rem;color:var(--mid);margin-bottom:3px}
+.uz-hint{font-size:.6rem;color:var(--lo);letter-spacing:.08em}
+.prev-strip{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.prev-wrap{position:relative;display:inline-block}
+.prev-img{width:70px;height:70px;object-fit:cover;border:1px solid var(--bdr);display:block}
+.prev-rm{position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;
+  background:var(--danger);color:#fff;font-size:.58rem;
+  display:flex;align-items:center;justify-content:center;border:none;cursor:pointer}
 
-  /* TOAST */
-  #toast {
-    position: fixed; bottom: 28px; right: 28px; z-index: 9000;
-    padding: 14px 22px; border-radius: 10px; font-size: 0.85rem; font-weight: 500;
-    background: var(--ocean-1); color: #fff;
-    box-shadow: 0 8px 30px rgba(10,61,98,0.3);
-    transform: translateY(80px); opacity: 0; transition: all 0.35s;
-    max-width: 320px;
-  }
-  #toast.show { transform: translateY(0); opacity: 1; }
-  #toast.success { background: var(--success); }
-  #toast.error { background: var(--danger); }
+/* PROGRESS */
+.prog{margin-top:14px;display:none}
+.prog-bar{height:2px;background:rgba(94,150,184,.1);overflow:hidden}
+.prog-fill{height:100%;background:var(--ag);width:0%;transition:width .3s}
+.prog-lbl{font-size:.62rem;color:var(--mid);margin-top:6px;letter-spacing:.06em}
 
-  /* MANAGE TABLE */
-  .works-table { width: 100%; border-collapse: collapse; }
-  .works-table th { font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); text-align: left; padding: 10px 14px; border-bottom: 1px solid rgba(10,61,98,0.08); }
-  .works-table td { padding: 12px 14px; border-bottom: 1px solid rgba(10,61,98,0.05); font-size: 0.88rem; vertical-align: middle; }
-  .works-table tr:last-child td { border: none; }
-  .thumb-mini { width: 48px; height: 48px; border-radius: 6px; object-fit: cover; }
-  .thumb-mini-ph { width:48px; height:48px; border-radius:6px; background:var(--ocean-5); display:flex;align-items:center;justify-content:center;font-size:1.2rem; }
-  .badge { padding: 3px 10px; border-radius: 20px; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500; }
-  .badge-paintings { background: #ddf1fc; color: var(--ocean-1); }
-  .badge-woodburning { background: #f5e8d0; color: #7a4a0a; }
-  .badge-photography { background: #d0e8f5; color: #0a3d62; }
-  .badge-drawings { background: #e8d0f5; color: #4a0a7a; }
-  .del-btn { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 1.1rem; transition: color 0.2s; }
-  .del-btn:hover { color: var(--danger); }
+/* ACTION ROW */
+.ar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:20px}
 
-  /* PAGES */
-  .page { display: none; }
-  .page.active { display: block; }
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:11px 26px;
+  font-size:.62rem;font-weight:400;letter-spacing:.24em;text-transform:uppercase;
+  border:none;cursor:pointer;transition:all .24s var(--ease)}
+.btn-primary{background:var(--ag);color:var(--bg);box-shadow:0 3px 18px rgba(58,110,140,.22)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 7px 26px rgba(58,110,140,.38)}
+.btn-primary:disabled{opacity:.38;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-ghost{background:transparent;border:1px solid var(--bdr);color:var(--mid)}
+.btn-ghost:hover{border-color:var(--bdrh);color:var(--a4)}
+.btn-danger{background:rgba(192,57,43,.1);border:1px solid rgba(192,57,43,.22);color:#e06060}
+.btn-danger:hover{background:rgba(192,57,43,.22)}
 
-  /* PROGRESS BAR */
-  .progress-bar { height: 4px; border-radius: 2px; background: var(--ocean-5); margin-top: 10px; overflow: hidden; }
-  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--ocean-2), var(--ocean-3)); width: 0%; transition: width 0.3s; border-radius: 2px; }
+/* TOKEN FIELD */
+.tokwrap{position:relative}
+.tokwrap .fi{padding-right:42px}
+.tokeye{position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  color:var(--lo);font-size:.95rem;transition:color .2s;padding:2px}
+.tokeye:hover{color:var(--a3)}
 
-  /* SETTINGS */
-  .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  .bio-photo-upload { display: flex; align-items: center; gap: 16px; }
-  .bio-avatar { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; border: 3px solid var(--ocean-4); }
-  .bio-avatar-ph { width: 72px; height: 72px; border-radius: 50%; background: var(--ocean-5); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; border: 3px solid var(--ocean-4); }
+/* TABLE */
+.tw{overflow-x:auto}
+.tbl{width:100%;border-collapse:collapse;min-width:520px}
+.tbl th{font-size:.52rem;letter-spacing:.24em;text-transform:uppercase;color:var(--lo);
+  text-align:left;padding:10px 14px;border-bottom:1px solid var(--bdr);white-space:nowrap}
+.tbl td{padding:13px 14px;border-bottom:1px solid rgba(94,150,184,.05);
+  font-size:.82rem;vertical-align:middle}
+.tbl tr:last-child td{border:none}
+.tbl tr:hover td{background:rgba(94,150,184,.02)}
+.tsm{width:44px;height:44px;object-fit:cover;border:1px solid var(--bdr);display:block;flex-shrink:0}
+.tph{width:44px;height:44px;background:var(--bg3);display:flex;
+  align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.badge{display:inline-flex;padding:3px 10px;font-size:.54rem;
+  letter-spacing:.14em;text-transform:uppercase;font-weight:300}
+.bp{background:rgba(58,110,140,.15);color:var(--a3);border:1px solid rgba(58,110,140,.2)}
+.bw{background:rgba(80,130,100,.15);color:#70b898;border:1px solid rgba(80,130,100,.2)}
+.bph{background:rgba(90,70,140,.15);color:#9080c8;border:1px solid rgba(90,70,140,.2)}
+.bd{background:rgba(140,100,60,.15);color:#c0906050;border:1px solid rgba(140,100,60,.2);color:#c09060}
+.del{color:var(--lo);padding:4px;border-radius:3px;font-size:.95rem;
+  transition:color .2s,background .2s;line-height:1}
+.del:hover{color:#e06060;background:rgba(192,57,43,.1)}
+.es{text-align:center;padding:52px 20px;color:var(--lo);font-size:.78rem;letter-spacing:.1em}
+.ei{font-size:2rem;margin-bottom:10px;opacity:.3;display:block}
 
-  @media (max-width: 900px) {
-    .sidebar { width: 60px; }
-    .sidebar .sidebar-brand, .nav-item span, .sidebar-bottom { display: none; }
-    .nav-item { justify-content: center; padding: 16px; }
-    .main { margin-left: 60px; padding: 24px; }
-    .stats-row { grid-template-columns: repeat(2,1fr); }
-    .form-grid { grid-template-columns: 1fr; }
-    .settings-grid { grid-template-columns: 1fr; }
-  }
+/* SETTINGS GRID */
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+/* TOAST */
+#toast{position:fixed;bottom:24px;right:24px;z-index:9999;
+  display:flex;align-items:center;gap:10px;padding:12px 20px;
+  background:var(--bg3);border:1px solid var(--bdr);
+  box-shadow:0 8px 32px rgba(0,0,0,.6);
+  font-size:.76rem;font-weight:300;letter-spacing:.04em;color:var(--hi);
+  transform:translateY(60px);opacity:0;transition:all .3s var(--ease);max-width:300px}
+#toast.on{transform:none;opacity:1}
+#toast.ok{border-color:rgba(39,174,96,.26);background:rgba(39,174,96,.08)}
+#toast.err{border-color:rgba(192,57,43,.26);background:rgba(192,57,43,.08)}
+.tic{font-size:.88rem}
+
+/* SPINNER */
+.spin{display:inline-block;width:14px;height:14px;
+  border:1.5px solid rgba(94,150,184,.2);border-top-color:var(--a2);
+  border-radius:50%;animation:rot .7s linear infinite;flex-shrink:0}
+@keyframes rot{to{transform:rotate(360deg)}}
+
+/* RESPONSIVE */
+@media(max-width:860px){
+  .sb{width:50px}
+  .sb-head .sb-logo,.sb-head .sb-sub,.sb-grp,.sb-item span,.sb-foot{display:none}
+  .sb-item{justify-content:center;padding:14px;border-left:none;border-bottom:2px solid transparent}
+  .sb-item.on{border-bottom-color:var(--a2);background:rgba(94,150,184,.07)}
+  .main{margin-left:50px}
+  .topbar,.bw{padding-left:18px;padding-right:18px}
+  .srow{grid-template-columns:repeat(2,1fr)}
+  .fg,.sgrid{grid-template-columns:1fr}
+  .fc.full{grid-column:1}
+}
 </style>
 </head>
 <body>
 
-<!-- ─── LOCK ────────────────────────────────────────────── -->
-<div id="lockScreen">
-  <div class="lock-card">
-    <div class="lock-logo">Besim Dauti</div>
-    <div class="lock-sub">Studio Admin Panel</div>
-    <input type="password" id="pwInput" placeholder="Enter password" autocomplete="current-password" />
-    <button onclick="tryLogin()">Enter Studio</button>
-    <div class="lock-err" id="lockErr"></div>
+<!-- LOCK ────────────────────────────────────────────────────── -->
+<div id="ls">
+  <div class="lc">
+    <div class="lc-logo">Besim Dauti</div>
+    <div class="lc-sub">Studio Admin</div>
+    <input class="lc-in" type="password" id="pwIn" placeholder="Enter password" autocomplete="current-password"/>
+    <button class="lc-btn" id="lckBtn">Enter Studio</button>
+    <div class="lc-err" id="lckErr"></div>
   </div>
 </div>
 
-<!-- ─── APP ─────────────────────────────────────────────── -->
-<div class="app" id="app">
-  <div class="sidebar">
-    <div class="sidebar-brand">
-      <div class="name">Besim Dauti</div>
-      <div class="panel">Admin Panel</div>
-    </div>
-    <div class="nav-item active" data-page="dashboard" onclick="showPage('dashboard',this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-      <span>Dashboard</span>
-    </div>
-    <div class="nav-item" data-page="upload" onclick="showPage('upload',this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-      <span>Upload Work</span>
-    </div>
-    <div class="nav-item" data-page="manage" onclick="showPage('manage',this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>
-      <span>Manage Works</span>
-    </div>
-    <div class="nav-item" data-page="settings" onclick="showPage('settings',this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-      <span>Settings</span>
-    </div>
-    <div class="sidebar-bottom">
-      <button class="logout-btn" onclick="logout()">Log Out</button>
-    </div>
-  </div>
+<!-- APP ─────────────────────────────────────────────────────── -->
+<div id="app">
 
-  <div class="main">
+  <!-- SIDEBAR -->
+  <aside class="sb">
+    <div class="sb-head">
+      <div class="sb-logo">Besim Dauti</div>
+      <div class="sb-sub">Admin Panel</div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-grp">Workspace</div>
+      <div class="sb-item on" data-pg="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <span>Dashboard</span>
+      </div>
+      <div class="sb-item" data-pg="upload">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <span>Upload Work</span>
+      </div>
+      <div class="sb-item" data-pg="manage">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
+        <span>Manage Works</span>
+      </div>
+      <div class="sb-grp">Studio</div>
+      <div class="sb-item" data-pg="settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06-.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        <span>Settings</span>
+      </div>
+    </nav>
+    <div class="sb-foot">
+      <button class="sb-fbt" onclick="window.open('index.html','_blank')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        <span>View Site</span>
+      </button>
+      <button class="sb-fbt danger" id="logoutBtn">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <span>Log Out</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN ──────────────────────────────────────────────────── -->
+  <main class="main">
+
     <!-- DASHBOARD -->
-    <div class="page active" id="page-dashboard">
+    <div class="pg on" id="pg-dashboard">
       <div class="topbar">
-        <h1 class="page-title">Good to see you, <em>Besim</em></h1>
+        <h1 class="ptitle">Welcome, <em>Besim</em></h1>
+        <button class="btn btn-ghost" id="dashRef">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+          Refresh
+        </button>
       </div>
-      <div class="stats-row">
-        <div class="stat-card"><div class="stat-num" id="st-total">0</div><div class="stat-lbl">Total Works</div></div>
-        <div class="stat-card"><div class="stat-num" id="st-paintings">0</div><div class="stat-lbl">Paintings</div></div>
-        <div class="stat-card"><div class="stat-num" id="st-woodburning">0</div><div class="stat-lbl">Woodburning</div></div>
-        <div class="stat-card"><div class="stat-num" id="st-photos">0</div><div class="stat-lbl">Photography</div></div>
-      </div>
-      <div class="card">
-        <div class="card-title">Recent Uploads</div>
-        <table class="works-table" id="recentTable">
-          <thead><tr><th>Image</th><th>Title</th><th>Category</th><th>Year</th></tr></thead>
-          <tbody id="recentBody"></tbody>
-        </table>
+      <div class="bw">
+        <div class="srow">
+          <div class="sbox"><div class="snum" id="stTotal">—</div><span class="slbl">Total Works</span></div>
+          <div class="sbox"><div class="snum" id="stPaint">—</div><span class="slbl">Paintings</span></div>
+          <div class="sbox"><div class="snum" id="stWood">—</div><span class="slbl">Woodburning</span></div>
+          <div class="sbox"><div class="snum" id="stPhoto">—</div><span class="slbl">Photography</span></div>
+        </div>
+        <div class="card">
+          <span class="clabel">Recent Uploads</span>
+          <div class="tw"><table class="tbl">
+            <thead><tr><th>Preview</th><th>Title</th><th>Category</th><th>Year</th></tr></thead>
+            <tbody id="recBody"><tr><td colspan="4"><div class="es"><div class="spin"></div></div></td></tr></tbody>
+          </table></div>
+        </div>
       </div>
     </div>
 
     <!-- UPLOAD -->
-    <div class="page" id="page-upload">
-      <div class="topbar"><h1 class="page-title">Upload <em>New Work</em></h1></div>
-      <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:24px">
-        <div class="card">
-          <div class="card-title">Work Details</div>
-          <div class="form-grid">
-            <div class="form-group">
-              <label>Title *</label>
-              <input type="text" id="fTitle" placeholder="e.g. Morning Silence" />
+    <div class="pg" id="pg-upload">
+      <div class="topbar"><h1 class="ptitle">Upload <em>New Work</em></h1></div>
+      <div class="bw">
+        <div style="display:grid;grid-template-columns:1.15fr 1fr;gap:16px;align-items:start">
+          <div class="card">
+            <span class="clabel">Work Details</span>
+            <div class="fg">
+              <div class="fc"><label class="fl">Title *</label><input class="fi" type="text" id="fTitle" placeholder="e.g. Morning Silence" autocomplete="off"/></div>
+              <div class="fc"><label class="fl">Category *</label>
+                <select class="fs" id="fCat">
+                  <option value="">— Select —</option>
+                  <option value="paintings">Paintings</option>
+                  <option value="woodburning">Woodburning</option>
+                  <option value="photography">Photography</option>
+                  <option value="drawings">Drawings</option>
+                </select>
+              </div>
+              <div class="fc"><label class="fl">Year</label><input class="fi" type="number" id="fYear" placeholder="2024" min="1970" max="2099"/></div>
+              <div class="fc"><label class="fl">Medium</label><input class="fi" type="text" id="fMedium" placeholder="e.g. Oil on canvas"/></div>
+              <div class="fc full"><label class="fl">Description</label><textarea class="ft" id="fDesc" placeholder="Story behind this piece…"></textarea></div>
             </div>
-            <div class="form-group">
-              <label>Category *</label>
-              <select id="fCat">
-                <option value="">— Select —</option>
-                <option value="paintings">Paintings</option>
-                <option value="woodburning">Woodburning</option>
-                <option value="photography">Photography</option>
-                <option value="drawings">Drawings</option>
-              </select>
+          </div>
+          <div>
+            <div class="card">
+              <span class="clabel">Image</span>
+              <div class="uz" id="uzZone">
+                <input type="file" id="fFile" accept="image/jpeg,image/png,image/webp"/>
+                <span class="uz-icon">🖼️</span>
+                <div class="uz-txt">Drop image or click to browse</div>
+                <div class="uz-hint">JPG · PNG · WEBP · max 10 MB</div>
+              </div>
+              <div class="prev-strip" id="prevStrip"></div>
+              <div class="prog" id="progWrap">
+                <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+                <div class="prog-lbl" id="progLbl"></div>
+              </div>
             </div>
-            <div class="form-group">
-              <label>Year</label>
-              <input type="number" id="fYear" placeholder="2024" min="1990" max="2099" />
-            </div>
-            <div class="form-group">
-              <label>Medium</label>
-              <input type="text" id="fMedium" placeholder="e.g. Oil on canvas" />
-            </div>
-            <div class="form-group full">
-              <label>Description (optional)</label>
-              <textarea id="fDesc" placeholder="Tell the story behind this piece..."></textarea>
+            <div class="ar" style="margin-top:14px">
+              <button class="btn btn-primary" id="pubBtn">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Publish to Gallery
+              </button>
+              <button class="btn btn-ghost" onclick="clearForm()">Clear</button>
             </div>
           </div>
         </div>
-        <div class="card">
-          <div class="card-title">Image</div>
-          <div class="upload-zone" id="uploadZone">
-            <input type="file" id="fFile" accept="image/*" multiple onchange="handleFiles(this.files)" />
-            <div class="icon">🖼️</div>
-            <p>Drop image here or click to browse</p>
-            <small>JPG · PNG · WEBP</small>
-          </div>
-          <div class="preview-strip" id="previewStrip"></div>
-          <div class="progress-bar" id="progressBar" style="display:none"><div class="progress-fill" id="progressFill"></div></div>
-        </div>
-      </div>
-      <div class="submit-row">
-        <button class="btn btn-primary" id="publishBtn" onclick="publishWork()">Publish to Gallery</button>
-        <button class="btn btn-outline" onclick="clearForm()">Clear</button>
-        <span id="publishStatus" style="font-size:0.82rem;color:var(--muted)"></span>
       </div>
     </div>
 
     <!-- MANAGE -->
-    <div class="page" id="page-manage">
+    <div class="pg" id="pg-manage">
       <div class="topbar">
-        <h1 class="page-title">Manage <em>Works</em></h1>
-        <button class="btn btn-outline" onclick="loadWorks()">↻ Refresh</button>
+        <h1 class="ptitle">Manage <em>Works</em></h1>
+        <button class="btn btn-ghost" onclick="loadWorks()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+          Refresh
+        </button>
       </div>
-      <div class="card">
-        <table class="works-table">
-          <thead><tr><th>Image</th><th>Title</th><th>Category</th><th>Year</th><th>Medium</th><th>Delete</th></tr></thead>
-          <tbody id="manageBody"></tbody>
-        </table>
+      <div class="bw">
+        <div class="card">
+          <div class="tw"><table class="tbl">
+            <thead><tr><th>Preview</th><th>Title</th><th>Category</th><th>Year</th><th>Medium</th><th></th></tr></thead>
+            <tbody id="manBody"><tr><td colspan="6"><div class="es"><div class="spin"></div></div></td></tr></tbody>
+          </table></div>
+        </div>
       </div>
     </div>
 
     <!-- SETTINGS -->
-    <div class="page" id="page-settings">
-      <div class="topbar"><h1 class="page-title">Studio <em>Settings</em></h1></div>
-      <div style="display:grid;gap:24px">
+    <div class="pg" id="pg-settings">
+      <div class="topbar"><h1 class="ptitle">Studio <em>Settings</em></h1></div>
+      <div class="bw">
         <div class="card">
-          <div class="card-title">GitHub Connection</div>
-          <div class="settings-grid">
-            <div class="form-group">
-              <label>GitHub Username</label>
-              <input type="text" id="sUser" placeholder="e.g. st117te" />
-            </div>
-            <div class="form-group">
-              <label>Repository Name</label>
-              <input type="text" id="sRepo" placeholder="e.g. st117te.github.io" />
-            </div>
-            <div class="form-group full">
-              <label>Personal Access Token (PAT)</label>
-              <div class="token-wrap">
-                <input type="password" id="sTok" placeholder="ghp_••••••••••••••••" />
-                <button class="token-toggle" onclick="toggleTok()">👁</button>
+          <span class="clabel">GitHub Connection</span>
+          <div class="sgrid">
+            <div class="fc"><label class="fl">GitHub Username</label><input class="fi" type="text" id="sUser" placeholder="e.g. besimdauti" autocomplete="off"/></div>
+            <div class="fc"><label class="fl">Repository Name</label><input class="fi" type="text" id="sRepo" placeholder="e.g. besimdauti.github.io" autocomplete="off"/></div>
+            <div class="fc"><label class="fl">Branch</label><input class="fi" type="text" id="sBranch" placeholder="main"/></div>
+            <div class="fc">
+              <label class="fl">Personal Access Token</label>
+              <div class="tokwrap">
+                <input class="fi" type="password" id="sTok" placeholder="ghp_••••••••••••" autocomplete="off"/>
+                <button class="tokeye" id="tokEye" type="button">👁</button>
               </div>
-              <small style="color:var(--muted);font-size:0.72rem;margin-top:4px">Stored locally in your browser only. Never sent anywhere except GitHub's API.</small>
-            </div>
-            <div class="form-group">
-              <label>Branch</label>
-              <input type="text" id="sBranch" placeholder="main" />
+              <div class="fn">Stored in your browser only. Requires Contents: Read &amp; Write.</div>
             </div>
           </div>
-          <div style="margin-top:16px;display:flex;gap:12px">
+          <div class="ar">
             <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
-            <button class="btn btn-outline" onclick="testConnection()">Test Connection</button>
+            <button class="btn btn-ghost" onclick="testConn()">Test Connection</button>
           </div>
         </div>
         <div class="card">
-          <div class="card-title">Admin Password</div>
-          <div class="settings-grid">
-            <div class="form-group">
-              <label>New Password</label>
-              <input type="password" id="newPw" placeholder="Enter new password" />
-            </div>
-            <div class="form-group">
-              <label>Confirm</label>
-              <input type="password" id="confPw" placeholder="Repeat new password" />
-            </div>
+          <span class="clabel">Change Password</span>
+          <div class="sgrid">
+            <div class="fc"><label class="fl">New Password</label><input class="fi" type="password" id="newPw" placeholder="New password"/></div>
+            <div class="fc"><label class="fl">Confirm</label><input class="fi" type="password" id="confPw" placeholder="Repeat password"/></div>
           </div>
-          <button class="btn btn-primary" style="margin-top:16px" onclick="changePw()">Update Password</button>
+          <div class="ar"><button class="btn btn-primary" onclick="changePw()">Update Password</button></div>
+        </div>
+        <div class="card">
+          <span class="clabel">How to Create a GitHub Token</span>
+          <ol style="padding-left:20px;color:var(--mid);font-size:.8rem;line-height:2.1;font-weight:300">
+            <li>Go to <strong style="color:var(--hi)">github.com → Settings → Developer settings → Personal access tokens → Fine-grained tokens</strong></li>
+            <li>Click <strong style="color:var(--hi)">Generate new token</strong></li>
+            <li>Under <em style="color:var(--a3)">Repository access</em>, select your portfolio repo</li>
+            <li>Under <em style="color:var(--a3)">Permissions → Contents</em>, set to <strong style="color:var(--hi)">Read and write</strong></li>
+            <li>Generate, copy, and paste the token above, then Save Settings</li>
+          </ol>
         </div>
       </div>
     </div>
-  </div>
+
+  </main>
 </div>
 
-<div id="toast"></div>
+<div id="toast"><span class="tic" id="tic"></span><span id="tmsg"></span></div>
 
 <script>
-/* ─── AUTH ───────────────────────────────────────────────────── */
-const DEFAULT_PW = 'studio2024';
-function getPw() { return localStorage.getItem('adminPw') || DEFAULT_PW; }
-function tryLogin() {
-  const v = document.getElementById('pwInput').value;
-  if (v === getPw()) {
-    localStorage.setItem('adminSess','1');
-    document.getElementById('lockScreen').style.display = 'none';
-    document.getElementById('app').classList.add('visible');
-    init();
-  } else {
-    document.getElementById('lockErr').textContent = 'Incorrect password.';
-    setTimeout(()=>document.getElementById('lockErr').textContent='', 2000);
-  }
+'use strict';
+/* ── AUTH ──────────────────────────────────────────────────── */
+const DEF='studio2024';
+const getPw=()=>localStorage.getItem('bd_pw')||DEF;
+
+function tryLogin(){
+  const v=document.getElementById('pwIn').value;
+  if(!v){setErr('Enter your password');return;}
+  if(v===getPw()){
+    localStorage.setItem('bd_s','1');
+    document.getElementById('ls').style.display='none';
+    document.getElementById('app').classList.add('on');
+    boot();
+  }else{setErr('Incorrect password');document.getElementById('pwIn').value='';}
 }
-function logout() { localStorage.removeItem('adminSess'); location.reload(); }
-document.getElementById('pwInput').addEventListener('keydown', e => { if(e.key==='Enter') tryLogin(); });
-if (localStorage.getItem('adminSess') === '1') {
-  document.getElementById('lockScreen').style.display='none';
-  document.getElementById('app').classList.add('visible');
-  document.addEventListener('DOMContentLoaded', init);
-} else {
-  document.addEventListener('DOMContentLoaded', ()=>{});
+function setErr(m){const e=document.getElementById('lckErr');e.textContent=m;setTimeout(()=>e.textContent='',3e3);}
+document.getElementById('lckBtn').addEventListener('click',tryLogin);
+document.getElementById('pwIn').addEventListener('keydown',e=>{if(e.key==='Enter')tryLogin();});
+document.getElementById('logoutBtn').addEventListener('click',()=>{localStorage.removeItem('bd_s');location.reload();});
+if(localStorage.getItem('bd_s')==='1'){
+  document.getElementById('ls').style.display='none';
+  document.getElementById('app').classList.add('on');
+  document.addEventListener('DOMContentLoaded',boot);
 }
 
-/* ─── SETTINGS ───────────────────────────────────────────────── */
-function getSt() { return JSON.parse(localStorage.getItem('ghSettings')||'{}'); }
-function saveSt(o) { localStorage.setItem('ghSettings', JSON.stringify(o)); }
-function saveSettings() {
-  saveSt({ user: val('sUser'), repo: val('sRepo'), tok: val('sTok'), branch: val('sBranch')||'main' });
-  toast('Settings saved!', 'success');
-}
-function loadSettings() {
-  const s = getSt();
-  setVal('sUser', s.user||''); setVal('sRepo', s.repo||''); setVal('sTok', s.tok||''); setVal('sBranch', s.branch||'main');
-}
-function toggleTok() {
-  const i = document.getElementById('sTok');
-  i.type = i.type==='password' ? 'text' : 'password';
-}
-async function testConnection() {
-  const s = getSt();
-  if (!s.tok || !s.user || !s.repo) { toast('Fill in GitHub settings first.','error'); return; }
-  try {
-    const r = await ghGet(`repos/${s.user}/${s.repo}`);
-    toast(`✓ Connected to ${r.full_name}`, 'success');
-  } catch(e) { toast('Connection failed: '+e.message,'error'); }
-}
-function changePw() {
-  const a = val('newPw'), b = val('confPw');
-  if (!a) return toast('Enter a password','error');
-  if (a !== b) return toast("Passwords don't match",'error');
-  localStorage.setItem('adminPw', a);
-  toast('Password updated!','success');
-  setVal('newPw',''); setVal('confPw','');
-}
+/* ── SETTINGS ──────────────────────────────────────────────── */
+const gst=()=>JSON.parse(localStorage.getItem('bd_gh')||'{}');
+const sst=o=>localStorage.setItem('bd_gh',JSON.stringify(o));
+const GU=()=>gst().user||'';
+const GR=()=>gst().repo||'';
+const GB=()=>gst().branch||'main';
+const GT=()=>gst().tok||'';
 
-/* ─── GITHUB API ─────────────────────────────────────────────── */
-function tok() { return getSt().tok||''; }
-function ghUser() { return getSt().user||''; }
-function ghRepo() { return getSt().repo||''; }
-function ghBranch() { return getSt().branch||'main'; }
-const GH = 'https://api.github.com';
-async function ghGet(path) {
-  const r = await fetch(`${GH}/${path}`, { headers: { Authorization:`token ${tok()}`, Accept:'application/vnd.github.v3+json' } });
-  if (!r.ok) throw new Error(r.status);
-  return r.json();
+function loadSettings(){
+  const s=gst();
+  sv('sUser',s.user||'');sv('sRepo',s.repo||'');sv('sBranch',s.branch||'main');sv('sTok',s.tok||'');
 }
-async function ghPut(path, body) {
-  const r = await fetch(`${GH}/${path}`, { method:'PUT', headers: { Authorization:`token ${tok()}`, Accept:'application/vnd.github.v3+json', 'Content-Type':'application/json' }, body: JSON.stringify(body) });
-  if (!r.ok) { const e = await r.json(); throw new Error(e.message||r.status); }
-  return r.json();
+function saveSettings(){
+  sst({user:gv('sUser'),repo:gv('sRepo'),branch:gv('sBranch')||'main',tok:gv('sTok')});
+  toast('Settings saved','ok');
 }
-async function ghDel(path, body) {
-  const r = await fetch(`${GH}/${path}`, { method:'DELETE', headers: { Authorization:`token ${tok()}`, Accept:'application/vnd.github.v3+json', 'Content-Type':'application/json' }, body: JSON.stringify(body) });
-  if (!r.ok) { const e = await r.json(); throw new Error(e.message||r.status); }
+async function testConn(){
+  if(!GT()||!GU()||!GR()){toast('Fill in all settings first','err');return;}
+  try{const r=await ghFetch(`repos/${GU()}/${GR()}`);toast('✓ Connected to '+r.full_name,'ok');}
+  catch(e){toast('Failed: '+e.message,'err');}
+}
+function changePw(){
+  const a=gv('newPw'),b=gv('confPw');
+  if(!a){toast('Enter a password','err');return;}
+  if(a!==b){toast("Passwords don't match",'err');return;}
+  localStorage.setItem('bd_pw',a);toast('Password updated','ok');
+  sv('newPw','');sv('confPw','');
+}
+document.getElementById('tokEye').addEventListener('click',()=>{
+  const i=document.getElementById('sTok');i.type=i.type==='password'?'text':'password';
+});
+
+/* ── GITHUB ────────────────────────────────────────────────── */
+const GH='https://api.github.com';
+const GH_H=()=>({Authorization:`token ${GT()}`,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'});
+async function ghFetch(path,method='GET',body){
+  const r=await fetch(`${GH}/${path}`,{method,headers:GH_H(),body:body?JSON.stringify(body):undefined});
+  if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.message||String(r.status));}
   return r.json();
 }
 
-/* ─── WORKS DATA ─────────────────────────────────────────────── */
-// Load / save works.json via GitHub API
-async function fetchWorksJson() {
-  try {
-    const data = await ghGet(`repos/${ghUser()}/${ghRepo()}/contents/works.json`);
-    return { works: JSON.parse(atob(data.content)), sha: data.sha };
-  } catch { return { works: [], sha: null }; }
+let _sha=null;
+async function fetchWorks(){
+  try{
+    const d=await ghFetch(`repos/${GU()}/${GR()}/contents/works.json`);
+    _sha=d.sha;
+    return JSON.parse(atob(d.content.replace(/\s/g,'')));
+  }catch{_sha=null;return[];}
 }
-async function saveWorksJson(works, sha) {
-  const content = btoa(unescape(encodeURIComponent(JSON.stringify(works, null, 2))));
-  const body = { message: `Update works.json [${new Date().toISOString()}]`, content, branch: ghBranch() };
-  if (sha) body.sha = sha;
-  await ghPut(`repos/${ghUser()}/${ghRepo()}/contents/works.json`, body);
+async function pushWorks(works){
+  const content=btoa(unescape(encodeURIComponent(JSON.stringify(works,null,2))));
+  const body={message:'Update works.json',content,branch:GB()};
+  if(_sha)body.sha=_sha;
+  const res=await ghFetch(`repos/${GU()}/${GR()}/contents/works.json`,'PUT',body);
+  _sha=res.content.sha;
 }
-async function uploadImage(file, filename) {
-  return new Promise((res, rej) => {
-    const r = new FileReader();
-    r.onload = async () => {
-      const b64 = r.result.split(',')[1];
-      try {
-        // check if file exists (get sha)
-        let sha = null;
-        try { const ex = await ghGet(`repos/${ghUser()}/${ghRepo()}/contents/images/${filename}`); sha = ex.sha; } catch {}
-        const body = { message:`Upload ${filename}`, content: b64, branch: ghBranch() };
-        if (sha) body.sha = sha;
-        const resp = await ghPut(`repos/${ghUser()}/${ghRepo()}/contents/images/${filename}`, body);
-        res(`https://${ghUser()}.github.io/${ghRepo()}/images/${filename}`);
-      } catch(e) { rej(e); }
+async function pushImage(file,fname){
+  return new Promise((res,rej)=>{
+    const rd=new FileReader();
+    rd.onload=async()=>{
+      const b64=rd.result.split(',')[1];
+      try{
+        let sha=null;
+        try{const ex=await ghFetch(`repos/${GU()}/${GR()}/contents/images/${fname}`);sha=ex.sha;}catch{}
+        const body={message:'Upload '+fname,content:b64,branch:GB()};
+        if(sha)body.sha=sha;
+        await ghFetch(`repos/${GU()}/${GR()}/contents/images/${fname}`,'PUT',body);
+        const isRoot=GR()===`${GU()}.github.io`;
+        res(isRoot
+          ?`https://${GU()}.github.io/images/${fname}`
+          :`https://${GU()}.github.io/${GR()}/images/${fname}`);
+      }catch(e){rej(e);}
     };
-    r.onerror = () => rej(new Error('Read failed'));
-    r.readAsDataURL(file);
+    rd.onerror=()=>rej(new Error('File read failed'));
+    rd.readAsDataURL(file);
   });
 }
 
-/* ─── UPLOAD FORM ─────────────────────────────────────────────── */
-let pickedFiles = [];
-function handleFiles(files) {
-  pickedFiles = Array.from(files);
-  const strip = document.getElementById('previewStrip');
-  strip.innerHTML = '';
-  pickedFiles.forEach(f => {
-    const url = URL.createObjectURL(f);
-    const img = document.createElement('img');
-    img.className = 'preview-thumb'; img.src = url;
-    strip.appendChild(img);
-  });
+/* ── UPLOAD FORM ───────────────────────────────────────────── */
+let pFile=null;
+document.getElementById('fFile').addEventListener('change',function(){if(this.files[0])setFile(this.files[0]);});
+const UZ=document.getElementById('uzZone');
+UZ.addEventListener('dragover',e=>{e.preventDefault();UZ.classList.add('drag');});
+UZ.addEventListener('dragleave',e=>{if(!UZ.contains(e.relatedTarget))UZ.classList.remove('drag');});
+UZ.addEventListener('drop',e=>{
+  e.preventDefault();UZ.classList.remove('drag');
+  const f=e.dataTransfer.files[0];
+  if(f&&f.type.startsWith('image/'))setFile(f);
+  else toast('Drop an image file','err');
+});
+function setFile(f){
+  if(f.size>10*1024*1024){toast('Max 10 MB','err');return;}
+  pFile=f;
+  const s=document.getElementById('prevStrip');s.innerHTML='';
+  const url=URL.createObjectURL(f);
+  const wrap=document.createElement('div');wrap.className='prev-wrap';
+  const img=document.createElement('img');img.className='prev-img';img.src=url;
+  const rm=document.createElement('button');rm.className='prev-rm';rm.textContent='✕';
+  rm.onclick=()=>{s.innerHTML='';pFile=null;document.getElementById('fFile').value='';};
+  wrap.appendChild(img);wrap.appendChild(rm);s.appendChild(wrap);
 }
-const zone = document.getElementById('uploadZone');
-if (zone) {
-  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag'); });
-  zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
-  zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag'); handleFiles(e.dataTransfer.files); });
+function setP(pct,lbl){
+  document.getElementById('progWrap').style.display='block';
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('progLbl').textContent=lbl;
 }
+function clearP(){setTimeout(()=>{document.getElementById('progWrap').style.display='none';document.getElementById('progFill').style.width='0';},700);}
 
-async function publishWork() {
-  const title = val('fTitle'), cat = val('fCat'), year = val('fYear'), medium = val('fMedium'), desc = val('fDesc');
-  if (!title || !cat) return toast('Title and category are required.','error');
-  if (!tok() || !ghUser() || !ghRepo()) return toast('Set up GitHub settings first.','error');
+document.getElementById('pubBtn').addEventListener('click',async function(){
+  const title=gv('fTitle'),cat=gv('fCat'),year=gv('fYear'),medium=gv('fMedium'),desc=gv('fDesc');
+  if(!title){toast('Title required','err');document.getElementById('fTitle').focus();return;}
+  if(!cat){toast('Select a category','err');document.getElementById('fCat').focus();return;}
+  if(!GT()||!GU()||!GR()){toast('Set up GitHub settings first','err');showPg('settings');return;}
 
-  const btn = document.getElementById('publishBtn');
-  btn.disabled = true; btn.textContent = 'Publishing…';
-
-  try {
-    const { works, sha } = await fetchWorksJson();
-    const pb = document.getElementById('progressBar');
-    const pf = document.getElementById('progressFill');
-    pb.style.display = 'block'; pf.style.width = '10%';
-
-    let srcUrl = '';
-    if (pickedFiles.length) {
-      const f = pickedFiles[0];
-      const ext = f.name.split('.').pop();
-      const fname = `${title.toLowerCase().replace(/\s+/g,'-')}-${Date.now()}.${ext}`;
-      pf.style.width = '35%';
-      srcUrl = await uploadImage(f, fname);
-      pf.style.width = '65%';
+  const btn=this;btn.disabled=true;
+  btn.innerHTML='<div class="spin"></div> Publishing…';
+  try{
+    const works=await fetchWorks();
+    setP(15,'Loading gallery…');
+    let src='';
+    if(pFile){
+      setP(30,'Uploading image…');
+      const ext=(pFile.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z]/g,'jpg');
+      const slug=title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+      src=await pushImage(pFile,`${slug}-${Date.now()}.${ext}`);
+      setP(70,'Image ready…');
     }
-
-    const newWork = {
-      id: Date.now(),
-      title, cat, year: year ? +year : new Date().getFullYear(),
-      medium: medium||'', description: desc||'',
-      src: srcUrl, uploadedAt: new Date().toISOString()
-    };
-    works.unshift(newWork);
-    pf.style.width = '80%';
-    await saveWorksJson(works, sha);
-    pf.style.width = '100%';
-
-    toast(`"${title}" published!`, 'success');
+    const work={id:Date.now(),title,cat,
+      year:year?parseInt(year,10):new Date().getFullYear(),
+      medium:medium||'',description:desc||'',src,
+      uploadedAt:new Date().toISOString()};
+    works.unshift(work);
+    setP(85,'Saving gallery…');
+    await pushWorks(works);
+    setP(100,'Done!');clearP();
+    toast('"'+title+'" published!','ok');
     clearForm();
-    setTimeout(()=>{ pb.style.display='none'; pf.style.width='0%'; },800);
-    loadWorks();
-    updateStats(works);
-  } catch(e) {
-    toast('Error: '+e.message,'error');
-  }
-  btn.disabled = false; btn.textContent = 'Publish to Gallery';
+    renderStats(works);renderRecent(works);
+  }catch(e){toast('Error: '+e.message,'err');clearP();}
+  btn.disabled=false;
+  btn.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Publish to Gallery';
+});
+function clearForm(){
+  ['fTitle','fCat','fYear','fMedium','fDesc'].forEach(id=>sv(id,''));
+  pFile=null;document.getElementById('prevStrip').innerHTML='';document.getElementById('fFile').value='';
 }
 
-function clearForm() {
-  ['fTitle','fCat','fYear','fMedium','fDesc'].forEach(id=>setVal(id,''));
-  pickedFiles = []; document.getElementById('previewStrip').innerHTML = '';
-}
-
-/* ─── MANAGE ─────────────────────────────────────────────────── */
-async function loadWorks() {
-  const tbody = document.getElementById('manageBody');
-  tbody.innerHTML = '<tr><td colspan="6" style="color:var(--muted);padding:20px">Loading…</td></tr>';
-  try {
-    const { works } = await fetchWorksJson();
-    updateStats(works);
-    renderManage(works);
-    renderRecent(works);
-  } catch(e) {
-    tbody.innerHTML = `<tr><td colspan="6" style="color:var(--danger);padding:20px">${e.message}</td></tr>`;
+/* ── MANAGE / DASHBOARD ────────────────────────────────────── */
+async function loadWorks(){
+  const mb=document.getElementById('manBody');
+  mb.innerHTML='<tr><td colspan="6"><div class="es"><div class="spin"></div></div></td></tr>';
+  try{
+    const w=await fetchWorks();
+    renderStats(w);renderRecent(w);renderManage(w);
+  }catch(e){
+    mb.innerHTML=`<tr><td colspan="6"><div class="es" style="color:#e06060">${esc(e.message)}</div></td></tr>`;
   }
 }
-function renderManage(works) {
-  const tbody = document.getElementById('manageBody');
-  if (!works.length) { tbody.innerHTML='<tr><td colspan="6" style="color:var(--muted);padding:20px;text-align:center">No works yet. Upload your first piece!</td></tr>'; return; }
-  tbody.innerHTML = works.map(w => `
+function renderStats(w){
+  se('stTotal',w.length||0);
+  se('stPaint',w.filter(x=>x.cat==='paintings').length||0);
+  se('stWood',w.filter(x=>x.cat==='woodburning').length||0);
+  se('stPhoto',w.filter(x=>x.cat==='photography').length||0);
+}
+function renderRecent(works){
+  const rb=document.getElementById('recBody');
+  const list=works.slice(0,6);
+  if(!list.length){rb.innerHTML='<tr><td colspan="4"><div class="es"><span class="ei">🎨</span>No works yet</div></td></tr>';return;}
+  rb.innerHTML=list.map(w=>`
     <tr>
-      <td>${w.src ? `<img class="thumb-mini" src="${w.src}" alt="${w.title}"/>` : `<div class="thumb-mini-ph">🖼️</div>`}</td>
-      <td><strong>${w.title}</strong></td>
-      <td><span class="badge badge-${w.cat}">${w.cat}</span></td>
-      <td>${w.year||'—'}</td>
-      <td>${w.medium||'—'}</td>
-      <td><button class="del-btn" onclick="deleteWork(${w.id})" title="Delete">🗑</button></td>
-    </tr>
-  `).join('');
+      <td>${w.src?`<img class="tsm" src="${esc(w.src)}" alt="${esc(w.title)}"/>`:`<div class="tph">🖼️</div>`}</td>
+      <td style="font-weight:400">${esc(w.title)}</td>
+      <td><span class="badge ${bc(w.cat)}">${esc(w.cat)}</span></td>
+      <td style="color:var(--mid)">${w.year||'—'}</td>
+    </tr>`).join('');
 }
-function renderRecent(works) {
-  const tbody = document.getElementById('recentBody');
-  const recent = works.slice(0,6);
-  tbody.innerHTML = recent.length ? recent.map(w => `
+function renderManage(works){
+  const mb=document.getElementById('manBody');
+  if(!works.length){mb.innerHTML='<tr><td colspan="6"><div class="es"><span class="ei">🎨</span>Upload your first piece!</div></td></tr>';return;}
+  mb.innerHTML=works.map(w=>`
     <tr>
-      <td>${w.src ? `<img class="thumb-mini" src="${w.src}" alt="${w.title}"/>` : `<div class="thumb-mini-ph">🖼️</div>`}</td>
-      <td>${w.title}</td>
-      <td><span class="badge badge-${w.cat}">${w.cat}</span></td>
-      <td>${w.year||'—'}</td>
-    </tr>
-  `).join('') : '<tr><td colspan="4" style="color:var(--muted);padding:20px">No works yet.</td></tr>';
+      <td>${w.src?`<img class="tsm" src="${esc(w.src)}" alt="${esc(w.title)}"/>`:`<div class="tph">🖼️</div>`}</td>
+      <td style="font-weight:400">${esc(w.title)}</td>
+      <td><span class="badge ${bc(w.cat)}">${esc(w.cat)}</span></td>
+      <td style="color:var(--mid)">${w.year||'—'}</td>
+      <td style="color:var(--mid)">${esc(w.medium||'—')}</td>
+      <td><button class="del" data-id="${w.id}" title="Delete">🗑</button></td>
+    </tr>`).join('');
+  mb.querySelectorAll('.del').forEach(b=>b.addEventListener('click',()=>delWork(+b.dataset.id)));
 }
-function updateStats(works) {
-  setEl('st-total', works.length);
-  setEl('st-paintings', works.filter(w=>w.cat==='paintings').length);
-  setEl('st-woodburning', works.filter(w=>w.cat==='woodburning').length);
-  setEl('st-photos', works.filter(w=>w.cat==='photography').length);
-}
-async function deleteWork(id) {
-  if (!confirm('Delete this work? This cannot be undone.')) return;
-  try {
-    const { works, sha } = await fetchWorksJson();
-    const updated = works.filter(w => w.id !== id);
-    await saveWorksJson(updated, sha);
-    toast('Work deleted.','success');
-    loadWorks();
-  } catch(e) { toast('Error: '+e.message,'error'); }
+function bc(c){return{paintings:'bp',woodburning:'bw',photography:'bph',drawings:'bd'}[c]||'bp';}
+async function delWork(id){
+  if(!confirm('Delete this work? Cannot be undone.'))return;
+  try{
+    const works=await fetchWorks();
+    const upd=works.filter(w=>w.id!==id);
+    await pushWorks(upd);
+    renderStats(upd);renderRecent(upd);renderManage(upd);
+    toast('Work deleted','ok');
+  }catch(e){toast('Error: '+e.message,'err');}
 }
 
-/* ─── NAV ────────────────────────────────────────────────────── */
-function showPage(id, el) {
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById('page-'+id).classList.add('active');
-  el.classList.add('active');
-  if (id==='manage') loadWorks();
-  if (id==='settings') loadSettings();
+/* ── NAVIGATION ─────────────────────────────────────────────── */
+function showPg(id){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('on'));
+  document.getElementById('pg-'+id).classList.add('on');
+  document.querySelector(`.sb-item[data-pg="${id}"]`).classList.add('on');
+  if(id==='manage'||id==='dashboard')loadWorks();
+  if(id==='settings')loadSettings();
+}
+document.querySelectorAll('.sb-item[data-pg]').forEach(el=>el.addEventListener('click',()=>showPg(el.dataset.pg)));
+document.getElementById('dashRef').addEventListener('click',loadWorks);
+
+/* ── TOAST ──────────────────────────────────────────────────── */
+let _tt;
+function toast(msg,type=''){
+  const t=document.getElementById('toast');
+  document.getElementById('tic').textContent={ok:'✓',err:'✕','':'ℹ'}[type]||'ℹ';
+  document.getElementById('tmsg').textContent=msg;
+  t.className='on'+(type?' '+type:'');
+  clearTimeout(_tt);_tt=setTimeout(()=>t.className='',3800);
 }
 
-/* ─── TOAST ──────────────────────────────────────────────────── */
-let toastTimer;
-function toast(msg, type='') {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.className = `show ${type}`;
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(()=>t.className='', 3500);
-}
+/* ── UTILS ──────────────────────────────────────────────────── */
+const gv=id=>document.getElementById(id)?.value?.trim()||'';
+const sv=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v;};
+const se=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
-/* ─── HELPERS ────────────────────────────────────────────────── */
-const val = id => document.getElementById(id)?.value?.trim()||'';
-const setVal = (id,v) => { if(document.getElementById(id)) document.getElementById(id).value = v; };
-const setEl = (id,v) => { if(document.getElementById(id)) document.getElementById(id).textContent = v; };
-
-/* ─── INIT ───────────────────────────────────────────────────── */
-function init() {
+/* ── BOOT ───────────────────────────────────────────────────── */
+function boot(){
   loadSettings();
-  if (!getSt().tok) {
-    // nudge toward settings
-    setTimeout(()=>toast('👋 Welcome! Set up GitHub settings first.'), 600);
-  } else {
-    loadWorks();
-  }
+  if(!GT())setTimeout(()=>toast('👋 Set up GitHub settings to get started'),700);
+  else loadWorks();
 }
 </script>
 </body>
